@@ -13,11 +13,13 @@ with Ada.Synchronous_Task_Control; use Ada.Synchronous_Task_Control;
 with Ada.Float_Text_IO; 	use Ada.Float_Text_IO;
 with Ada.Real_Time;			use Ada.Real_Time;
 with Ada.Command_Line; use Ada.Command_Line;
+with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Data;
 
 procedure Lab1 is
 
 	N: Integer := 8;
+	My_File: Ada.Text_IO.File_type;
 
 begin
 	if(Argument_Count > 0) then 
@@ -133,16 +135,18 @@ begin
 			end T2; 
 			
 	begin
-		null;		
-	end Start_Tasks;
-	
-	begin
-	Start_Tasks;
-	Suspend_Until_True(S);
-	t1 := Clock;
-	Put("N =   "); Put(N);
-	Put("      Work time: ");
-	Put(Duration'Image(Ada.Real_Time.To_Duration(t1 - t0))); Put_Line("s. ");
+		Set_True(Skd);
+		Start_Tasks;
+		Suspend_Until_True(S);
+		t1 := Clock;
+		Put("N =   "); Put(N);
+		Put("      Work time: ");
+		Put(Duration'Image(Ada.Real_Time.To_Duration(t1 - t0))); Put_Line("s. ");
+		
+		Create (File => My_File, Mode => Out_File, Name => Trim(Integer'Image(N), Ada.Strings.Left));
+		Put(File => My_File, Item => Trim(Duration'Image(Ada.Real_Time.To_Duration(t1 - t0)), Ada.Strings.Left));
+		Put(File => My_File, Item => ";");
+		Close(My_File);
 	end;
 	
 end Lab1;
