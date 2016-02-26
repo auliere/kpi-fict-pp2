@@ -35,7 +35,8 @@ package body Data is
 		if Size <= maxOutputSize then
 			for I in Range_T loop
 				--Get(A(I));
-				A(I) := 1.0;
+				--A(I) := 1.0;
+				Get_Random(A(I));
 			end loop;
 		else
 			for I in Range_T loop
