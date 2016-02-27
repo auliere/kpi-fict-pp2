@@ -44,8 +44,7 @@ begin
 		--Semaphores
 		Sem1, Sem2, Sem3, Sem4: Suspension_Object;
 
-		procedure Start_Tasks is		
-		
+		procedure Start_Tasks is				
 ---------------------------TASK T1----------------------
 			task T1 is
 				pragma Storage_Size(1000000000);
@@ -133,9 +132,12 @@ begin
 				Set_True(Sem4);
 				Put_Line("Task 2 finished");
 			end T2; 
-			
+		
+		begin
+			null;
+		end Start_Tasks;
+		
 	begin
-		Set_True(Skd);
 		Start_Tasks;
 		Suspend_Until_True(S);
 		t1 := Clock;
