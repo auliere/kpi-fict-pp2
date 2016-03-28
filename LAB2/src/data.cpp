@@ -94,6 +94,7 @@ DWORD WINAPI F1(LPVOID lparam)
 	int threadNo = 1;
 	double a1, b1;
 	MatrixXd MO1;
+	VectorXd C1;
 	
 	WaitForSingleObject(Mut_1, INFINITE);
 		cout << "Thread " << threadNo << " started" << endl;
@@ -103,52 +104,47 @@ DWORD WINAPI F1(LPVOID lparam)
 	A = RowVectorXd::Zero(M_SIZE);
 	B = inputVector();
 	MO = inputMatrix();
-	//Сигнал о завершении ввода S2,3,4.1 (Evt_1)
+	//Cигнал о завершении ввода S2,3,4.1 (Evt_1)
 	SetEvent(Evt_1);
 	//Ожидание ввода в T4 W4.1 (Evt_2)
 	WaitForSingleObject(Evt_2, INFINITE);
-	//Вход в КС
+	//Вход в КC
 	EnterCriticalSection(&CS_1);
 		//Копирование ОР a->a1, b->b1, MO->MO1
-		a1 = a;
-		b1 = b;
-		MO1 = MO;
-	//Выход из КС
+		a1 = a;	b1 = b;	MO1 = MO; C1 = C;
+	//Выход из КC
 	LeaveCriticalSection(&CS_1);	
-	//Счет Ah
-	calcTh(A, a1, B, b1, C, MO1, MK, 1);
-	//Сортировка Ah
+	//Cчет Ah
+	calcTh(A, a1, B, b1, C1, MO1, MK, 1);
+	//Cортировка Ah
 	auto begin = A.segment(0, H).data();
 	sort(begin, begin+H);
-	//Ожидание завершения сортировки в Т2 W2.1 (Sem_1)
+	//Ожидание завершения Cортировки в Т2 W2.1 (Sem_1)
 	WaitForSingleObject(Sem_1, INFINITE);
-	//Слияние первой половины A
+	//Cлияние первой половины A
 	auto begin2 = A.segment(0, 2*H).data();
 	inplace_merge(begin2, begin2 + H, begin2 + 2*H);
-	//Ожидание слияния второй половины А, W4.2 (Sem_3)
+	//Ожидание Cлияния второй половины А, W4.2 (Sem_3)
 	WaitForSingleObject(Sem_3, INFINITE);
-	//Слияние вектора А
+	//Cлияние вектора А
 	auto begin3 = A.data();
 	inplace_merge(begin3, begin3 + 2*H, begin3 + M_SIZE);
 	//Вывод вектора А
 	WaitForSingleObject(Mut_1, INFINITE);
-	if(M_SIZE < 9) 
-	{
-		cout << A << endl;
-	}
+	if (M_SIZE < 9) cout << A << endl;
 	ReleaseMutex(Mut_1);	
 	WaitForSingleObject(Mut_1, INFINITE);
 	cout << "Thread " << threadNo << " finished" << endl;
 	ReleaseMutex(Mut_1);	
 	return true;
 }
-
 ////////////////////////////  TASK 2 ///////////////////////////////////
 DWORD WINAPI F2(LPVOID lparam)
 {
 	int threadNo = 2;
 	double a2, b2;
 	MatrixXd MO2;	
+	VectorXd C2;
 	
 	WaitForSingleObject(Mut_1, INFINITE);
 	cout << "Thread " << threadNo << " started" << endl;
@@ -158,20 +154,18 @@ DWORD WINAPI F2(LPVOID lparam)
 	WaitForSingleObject(Evt_1, INFINITE);
 	//Ожидание ввода в T4 W4.1 (Evt_2)
 	WaitForSingleObject(Evt_2, INFINITE);
-	//Вход в КС
+	//Вход в КC
 	EnterCriticalSection(&CS_1);
 		//Копирование ОР a->a1, b->b1, MO->MO1
-		a2 = a;
-		b2 = b;
-		MO2 = MO;
-	//Выход из КС
+		a2 = a;	b2 = b;	MO2 = MO; C2 = C;
+	//Выход из КC
 	LeaveCriticalSection(&CS_1);
-	//Счет Ah
-	calcTh(A, a2, B, b2, C, MO2, MK, 2);
-	//Сортировка Ah	
+	//Cчет Ah
+	calcTh(A, a2, B, b2, C2, MO2, MK, 2);
+	//Cортировка Ah	
 	auto begin = A.segment(H, H).data();
 	sort(begin, begin+H);
-	//Сигнал о сортировке Ah S1.2 (Sem_1)
+	//Cигнал о Cортировке Ah S1.2 (Sem_1)
 	ReleaseSemaphore(Sem_1, 1, NULL);
 
 	WaitForSingleObject(Mut_1, INFINITE);	
@@ -179,14 +173,14 @@ DWORD WINAPI F2(LPVOID lparam)
 	ReleaseMutex(Mut_1);
 	return true;
 }
-
 ////////////////////////////  TASK 3 ///////////////////////////////////
 DWORD WINAPI F3(LPVOID lparam)
 {
 	int threadNo = 3;
 	double a3, b3;
 	MatrixXd MO3;	
-
+	VectorXd C3;
+	
 	WaitForSingleObject(Mut_1, INFINITE);
 	cout << "Thread " << threadNo << " started" << endl;
 	ReleaseMutex(Mut_1);
@@ -195,20 +189,18 @@ DWORD WINAPI F3(LPVOID lparam)
 	WaitForSingleObject(Evt_1, INFINITE);
 	//Ожидание ввода в T4 W4.1 (Evt_2)
 	WaitForSingleObject(Evt_2, INFINITE);
-	//Вход в КС
+	//Вход в КC
 	EnterCriticalSection(&CS_1);
 		//Копирование ОР a->a1, b->b1, MO->MO1
-		a3 = a;
-		b3 = b;
-		MO3 = MO;
-	//Выход из КС
+		a3 = a; b3 = b;	MO3 = MO; C3 = C;
+	//Выход из КC
 	LeaveCriticalSection(&CS_1);
-	//Счет Ah
-	calcTh(A, a3, B, b3, C, MO3, MK, 3);
-	//Сортировка Ah	
+	//Cчет Ah
+	calcTh(A, a3, B, b3, C3, MO3, MK, 3);
+	//Cортировка Ah	
 	auto begin = A.segment(2*H, H).data();
 	sort(begin, begin+H);
-	//Сигнал о сортировке Ah S4.2 (Sem_2)	
+	//Cигнал о Cортировке Ah S4.2 (Sem_2)	
 	ReleaseSemaphore(Sem_2, 1, NULL);
 	
 	WaitForSingleObject(Mut_1, INFINITE);
@@ -216,14 +208,14 @@ DWORD WINAPI F3(LPVOID lparam)
 	ReleaseMutex(Mut_1);
 	return true;
 }
-
 ////////////////////////////  TASK 4 ///////////////////////////////////
 DWORD WINAPI F4(LPVOID lparam)
 {
 	int threadNo = 4;
 	double a4, b4;
 	MatrixXd MO4;		
-
+	VectorXd C4;
+	
 	WaitForSingleObject(Mut_1, INFINITE);
 	cout << "Thread " << threadNo << " started" << endl;
 	ReleaseMutex(Mut_1);	
@@ -232,29 +224,27 @@ DWORD WINAPI F4(LPVOID lparam)
 	b = inputScalar();
 	C = inputVector();
 	MK = inputMatrix();
-	//Сигнал о завершении ввода S1,2,3.2 (Evt_2)
+	//Cигнал о завершении ввода S1,2,3.2 (Evt_2)
 	SetEvent(Evt_2);
 	//Ожидание ввода в Т1 W1.1 (Evt_1)
 	WaitForSingleObject(Evt_1, INFINITE);
-	//Вход в КС
+	//Вход в КC
 	EnterCriticalSection(&CS_1);
 		//Копирование ОР a->a1, b->b1, MO->MO1
-		a4 = a;
-		b4 = b;
-		MO4 = MO;
-	//Выход из КС
+		a4 = a;	b4 = b;	MO4 = MO; C4 = C;
+	//Выход из КC
 	LeaveCriticalSection(&CS_1);
-	//Счет Ah
-	calcTh(A, a4, B, b4, C, MO4, MK, 4);
-	//Сортировка Ah
+	//Cчет Ah
+	calcTh(A, a4, B, b4, C4, MO4, MK, 4);
+	//Cортировка Ah
 	auto begin = A.segment(3*H, (M_SIZE - 3*H)).data();
 	sort(begin, begin+(M_SIZE - 3*H));
-	//Ожидание завершения сортировки в Т3 W3.1 (Sem_2)
+	//Ожидание завершения Cортировки в Т3 W3.1 (Sem_2)
 	WaitForSingleObject(Sem_2, INFINITE);
-	//Слияние второй половины A
+	//Cлияние второй половины A
 	auto begin2 = A.segment(2*H, (M_SIZE - 2*H)).data();
 	inplace_merge(begin2, begin2 + H, begin2 + (M_SIZE - 2*H));
-	//Сигнал о слиянии второй половины А, S1.3 (Sem_3)
+	//Cигнал о Cлиянии второй половины А, S1.3 (Sem_3)
 	ReleaseSemaphore(Sem_3, 1, NULL);
 
 	WaitForSingleObject(Mut_1, INFINITE);	
@@ -262,7 +252,6 @@ DWORD WINAPI F4(LPVOID lparam)
 	ReleaseMutex(Mut_1);
 	return true;
 }
-
 
 MatrixXd inputMatrix()
 {
